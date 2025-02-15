@@ -13,40 +13,18 @@ load_dotenv()
 
 AIPROXY_TOKEN = os.getenv('AIPROXY_TOKEN')
 
-def A1(email="23f2000650@ds.study.iitm.ac.in"):
+def A1(email="xxxxxxxxx@ds.study.iitm.ac.in"):
     try:
-        # Step 1: Ensure /data directory exists
-        os.makedirs('/data', exist_ok=True)
-        script_path = '/data/datagen.py'
-        
-        # Step 2: Download the script to /data
-        url = "https://raw.githubusercontent.com/sanand0/tools-in-data-science-public/tds-2025-01/datagen.py"
-        response = requests.get(url)
-        response.raise_for_status()
-        
-        with open(script_path, 'w') as file:
-            file.write(response.text)
-        
-        # Step 3: Install `uv` if not present
-        try:
-            subprocess.run(["uv", "--version"], check=True)
-        except subprocess.CalledProcessError:
-            subprocess.run(["pip", "install", "uv"], check=True)
-        
-        # Step 4: Run the script using `uv`
         process = subprocess.Popen(
-            ["uv", "run", script_path, email],
+            ["uv", "run", "https://raw.githubusercontent.com/sanand0/tools-in-data-science-public/tds-2025-01/project-1/datagen.py", email],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
         )
         stdout, stderr = process.communicate()
-        
         if process.returncode != 0:
-            raise Exception(f"Error: {stderr}")
-        
+            raise HTTPException(status_code=500, detail=f"Error: {stderr}")
         return stdout
-    
-    except Exception as e:
-        raise Exception(f"Execution failed: {str(e)}")
+    except subprocess.CalledProcessError as e:
+        raise HTTPException(status_code=500, detail=f"Error: {e.stderr}")
     
     
 def A2(prettier_version="prettier@3.4.2", filename="/data/format.md"):
